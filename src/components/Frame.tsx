@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState, useMemo } from "react";
 import sdk, {
   AddFrame,
   SignIn as SignInCore,
@@ -25,6 +25,30 @@ export default function Frame(
   const [added, setAdded] = useState(false);
 
   const [addFrameResult, setAddFrameResult] = useState("");
+  const [trendingTags, setTrendingTags] = useState<{
+    daily: string[];
+    weekly: string[];
+    monthly: string[];
+  }>({ daily: [], weekly: [], monthly: [] });
+
+  // Fetch trending cash tags
+  useEffect(() => {
+    const fetchTrendingTags = async () => {
+      try {
+        const response = await fetch('/api/trending-tags');
+        const data = await response.json();
+        setTrendingTags({
+          daily: data.daily.slice(0, 5),
+          weekly: data.weekly.slice(0, 5),
+          monthly: data.monthly.slice(0, 5)
+        });
+      } catch (error) {
+        console.error('Error fetching trending tags:', error);
+      }
+    };
+
+    fetchTrendingTags();
+  }, []);
 
   const addFrame = useCallback(async () => {
     try {
@@ -117,7 +141,45 @@ export default function Frame(
       }}
     >
       <div className="w-[300px] mx-auto py-2 px-2">
-        <h1 className="text-2xl font-bold text-center mb-4">{title}</h1>
+        <h1 className="text-2xl font-bold text-center mb-4">CashFrameTrends</h1>
+        
+        <div className="space-y-4">
+          <div>
+            <h2 className="font-bold mb-2">Top 5 Cash Tags (24h)</h2>
+            <div className="space-y-1">
+              {trendingTags.daily.map((tag, i) => (
+                <div key={tag} className="flex items-center gap-2">
+                  <span className="text-neutral-500">#{i + 1}</span>
+                  <span className="font-mono">{tag}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h2 className="font-bold mb-2">Top 5 Cash Tags (7d)</h2>
+            <div className="space-y-1">
+              {trendingTags.weekly.map((tag, i) => (
+                <div key={tag} className="flex items-center gap-2">
+                  <span className="text-neutral-500">#{i + 1}</span>
+                  <span className="font-mono">{tag}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h2 className="font-bold mb-2">Top 5 Cash Tags (30d)</h2>
+            <div className="space-y-1">
+              {trendingTags.monthly.map((tag, i) => (
+                <div key={tag} className="flex items-center gap-2">
+                  <span className="text-neutral-500">#{i + 1}</span>
+                  <span className="font-mono">{tag}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
