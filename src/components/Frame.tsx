@@ -7,7 +7,6 @@ import sdk, {
   type Context,
 } from "@farcaster/frame-sdk";
 
-import { config } from "~/components/providers/WagmiProvider";
 import { PurpleButton } from "~/components/ui/PurpleButton";
 import { truncateAddress } from "~/lib/truncateAddress";
 import { base, optimism } from "wagmi/chains";
@@ -16,15 +15,17 @@ import { createStore } from "mipd";
 import { Label } from "~/components/ui/label";
 import { PROJECT_TITLE } from "~/lib/constants";
 
-export default function Frame(
-  { title }: { title?: string } = { title: PROJECT_TITLE }
-) {
+interface FrameProps {
+  title?: string;
+}
+
+export default function Frame({ title = PROJECT_TITLE }: FrameProps) {
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
   const [context, setContext] = useState<Context.FrameContext>();
 
   const [added, setAdded] = useState(false);
 
-  const [addFrameResult, setAddFrameResult] = useState("");
+  // Removed unused state
   const [trendingTags, setTrendingTags] = useState<{
     daily: string[];
     weekly: string[];
